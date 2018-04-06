@@ -1,0 +1,59 @@
+. TEST PROGRAM
+COPY    START   0 Comment here
+FIRST   STL     RETADR  Comment here
+        LDB     #LENGTH Comment here
+        BASE    LENGTH  Comment here
+CLOOP   +JSUB    RDREC  Comment here
+        LDA     LENGTH  Comment here
+        COMP    #0  Comment here
+        JEQ     ENDFIL  Comment here
+        +JSUB    WRREC  Comment here
+        J       CLOOP Comment here
+ENDFIL  LDA     =C'EOF' Comment here
+        STA    BUFFER Comment here
+        LDA     #3  Comment here
+        STA     LENGTH  Comment here
+        +JSUB    WRREC  Comment here
+        J       @RETADR Comment here
+        USE CBLKS
+     LTORG    Comment here
+RETADR  RESW    1 Comment here
+LENGTH  RESW    1 Comment here
+BUFFER  RESB    4096 Comment here
+BUFFEND EQU *
+MAXLEN EQU BUFFEND-BUFFER
+.
+.   RDREC SUBROUTINE
+.
+   USE
+RDREC   CLEAR   X Comment here
+        CLEAR   A Comment here
+        CLEAR   S Comment here
+        +LDT    #4096 Comment here
+RLOOP   TD      INPUT Comment here
+        JEQ     RLOOP Comment here
+        RD      INPUT Comment here
+        COMPR   A,S Comment here
+        JEQ     EXIT Comment here
+        STCH    BUFFER,X Comment here
+        TIXR    T Comment here
+        JLT     RLOOP Comment here
+        FIX   Adding to test format 1
+EXIT    STX     LENGTH Comment here
+        RSUB Comment here
+        ORG BUFFER
+INPUT   BYTE    X'F1' Comment here
+.
+.   WRREC SUBROUTINE
+.
+   ORG
+WRREC   CLEAR   X Comment here
+        LDT     LENGTH Comment here
+WLOOP   TD      =X'05' Comment here
+        JEQ     WLOOP Comment here
+        LDCH    BUFFER,X Comment here
+        WD      =X'05' Comment here
+        TIXR    T Comment here
+        JLT     WLOOP Comment here
+        RSUB Comment here
+        END     FIRST Comment here

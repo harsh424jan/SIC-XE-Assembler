@@ -1,0 +1,61 @@
+        . TEST PROGRAM
+00000 0 COPY    START 0                   Comment here
+00000 0 FIRST   STL   RETADR              Comment here
+00003 0         LDB   #LENGTH             Comment here
+                BASE  LENGTH              Comment here
+00006 0 CLOOP   +JSUB RDREC               Comment here
+0000A 0         LDA   LENGTH              Comment here
+0000D 0         COMP  #0                  Comment here
+00010 0         JEQ   ENDFIL              Comment here
+00013 0         +JSUB WRREC               Comment here
+00017 0         J     CLOOP               Comment here
+0001A 0 ENDFIL  LDA   =C'EOF'             Comment here
+0001D 0         STA   BUFFER              Comment here
+00020 0         LDA   #3                  Comment here
+00023 0         STA   LENGTH              Comment here
+00026 0         +JSUB WRREC               Comment here
+0002A 0         J     @RETADR             Comment here
+                USE   CBLKS               
+                LTORG                     Comment here
+00000 1 *       =C'EOF'                    
+00003 1 RETADR  RESW  1                   Comment here
+00006 1 LENGTH  RESW  1                   Comment here
+00009 1 BUFFER  RESB  4096                Comment here
+        BUFFEND EQU   *                   
+        MAXLEN  EQU   BUFFEND-BUFFER      
+        .
+        . RDREC SUBROUTINE
+        .
+                USE                       
+0002D 0 RDREC   CLEAR X                   Comment here
+0002F 0         CLEAR A                   Comment here
+00031 0         CLEAR S                   Comment here
+00033 0         +LDT  #4096               Comment here
+00037 0 RLOOP   TD    INPUT               Comment here
+0003A 0         JEQ   RLOOP               Comment here
+0003D 0         RD    INPUT               Comment here
+00040 0         COMPR A,S                 Comment here
+00042 0         JEQ   EXIT                Comment here
+00045 0         STCH  BUFFER,X            Comment here
+00048 0         TIXR  T                   Comment here
+0004A 0         JLT   RLOOP               Comment here
+0004D 0         FIX                       Adding to test format 1
+0004E 0 EXIT    STX   LENGTH              Comment here
+00051 0         RSUB                      Comment here
+                ORG   BUFFER              
+00009 0 INPUT   BYTE  X'F1'               Comment here
+        .
+        . WRREC SUBROUTINE
+        .
+                ORG                       
+00054 0 WRREC   CLEAR X                   Comment here
+00056 0         LDT   LENGTH              Comment here
+00059 0 WLOOP   TD    =X'05'              Comment here
+0005C 0         JEQ   WLOOP               Comment here
+0005F 0         LDCH  BUFFER,X            Comment here
+00062 0         WD    =X'05'              Comment here
+00065 0         TIXR  T                   Comment here
+00067 0         JLT   WLOOP               Comment here
+0006A 0         RSUB                      Comment here
+0006D 0 *       =X'05'                    
+0006E 0         END   FIRST               Comment here
